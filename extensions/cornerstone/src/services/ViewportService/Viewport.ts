@@ -18,6 +18,8 @@ export type ViewportOptions = {
   viewportType: Enums.ViewportType;
   toolGroupId: string;
   viewportId: string;
+  // Presentation ID to store/load presentation state from
+  presentationId?: string;
   orientation?: Types.Orientation;
   background?: Types.Point3;
   syncGroups?: SyncGroup[];
@@ -33,6 +35,7 @@ export type ViewportOptions = {
 export type PublicViewportOptions = {
   viewportType?: string;
   toolGroupId?: string;
+  presentationId?: string;
   viewportId?: string;
   orientation?: string;
   background?: Types.Point3;
@@ -40,6 +43,11 @@ export type PublicViewportOptions = {
   initialImageOptions?: InitialImageOptions;
   customViewportProps?: Record<string, unknown>;
   allowUnmatchedView?: boolean;
+};
+
+export type DisplaySetSelector = {
+  id?: string;
+  options?: PublicDisplaySetOptions;
 };
 
 export type PublicDisplaySetOptions = {
@@ -167,7 +175,10 @@ class ViewportInfo {
     viewportOptionsEntry: PublicViewportOptions
   ): void {
     let viewportType = viewportOptionsEntry.viewportType;
-    let toolGroupId = viewportOptionsEntry.toolGroupId;
+    const {
+      toolGroupId = DEFAULT_TOOLGROUP_ID,
+      presentationId,
+    } = viewportOptionsEntry;
     let orientation;
 
     if (!viewportType) {
@@ -185,16 +196,13 @@ class ViewportInfo {
       orientation = Enums.OrientationAxis.AXIAL;
     }
 
-    if (!toolGroupId) {
-      toolGroupId = DEFAULT_TOOLGROUP_ID;
-    }
-
     this.setViewportOptions({
       ...viewportOptionsEntry,
       viewportId: this.viewportId,
       viewportType: viewportType as Enums.ViewportType,
       orientation,
       toolGroupId,
+      presentationId,
     });
   }
 
@@ -241,11 +249,12 @@ class ViewportInfo {
   }
 
   private mapDisplaySetOptions(
-    publicDisplaySetOptions: Array<PublicDisplaySetOptions>
+    displaySetSelectors: Array<DisplaySetSelector> = [{}]
   ): Array<DisplaySetOptions> {
     const displaySetOptions: Array<DisplaySetOptions> = [];
 
-    publicDisplaySetOptions.forEach(option => {
+    displaySetSelectors.forEach(selector => {
+      let option = selector?.options;
       if (!option) {
         option = {
           blendMode: undefined,

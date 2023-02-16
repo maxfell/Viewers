@@ -11,6 +11,7 @@ const metadataProvider = classes.MetadataProvider;
  * @param {Object} configuration
  */
 export default function init({ servicesManager, configuration }) {
+  const { stateSyncService } = servicesManager.services;
   // Add
   DicomMetadataStore.subscribe(
     DicomMetadataStore.EVENTS.INSTANCES_ADDED,
@@ -23,6 +24,12 @@ export default function init({ servicesManager, configuration }) {
     DicomMetadataStore.EVENTS.SERIES_UPDATED,
     handlePETImageMetadata
   );
+
+  stateSyncService.register('viewportGridStore', { clearOnModeExit: true });
+  stateSyncService.register('displaySetSelectorMap', { clearOnModeExit: true });
+  stateSyncService.register('hanging', { clearOnModeExit: true });
+  stateSyncService.register('presentationSync', { clearOnModeExit: true });
+  stateSyncService.register('toggleHangingProtocol', { clearOnModeExit: true });
 }
 
 const handlePETImageMetadata = ({ SeriesInstanceUID, StudyInstanceUID }) => {

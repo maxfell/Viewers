@@ -312,9 +312,11 @@ const toolbarButtons = [
       label: 'MPR',
       commands: [
         {
-          commandName: 'toggleMPR',
-          commandOptions: {},
-          context: 'CORNERSTONE',
+          commandName: 'toggleHangingProtocol',
+          commandOptions: {
+            protocolId: 'mpr',
+          },
+          context: 'DEFAULT',
         },
       ],
     },

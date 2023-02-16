@@ -8,6 +8,52 @@ import { DragAndDropProvider, ImageViewerProvider } from '@ohif/ui';
 import { useQuery, useSearchParams } from '@hooks';
 import ViewportGrid from '@components/ViewportGrid';
 import Compose from './Compose';
+import { StudyMetadata } from 'platform/core/src/Types';
+
+const compare = (a, b, def = 0): number => {
+  if (a === b) return def;
+  if (a < b) return 1;
+  return -1;
+};
+
+/** The studies from display sets gets the studies in whatever
+ * order the display sets are in.
+ */
+const getStudiesfromDisplaySets = (
+  metadataStore,
+  displaysets
+): StudyMetadata => {
+  const studyMap = {};
+
+  const ret = displaySets.reduce((prev, curr) => {
+    const { StudyInstanceUID } = curr;
+    if (!studyMap[StudyInstanceUID]) {
+      const study = DicomMetadataStore.getStudy(StudyInstanceUID);
+      studyMap[StudyInstanceUID] = study;
+      prev.push(study);
+    }
+    return prev;
+  }, []);
+  ret.sort((a, b) => {
+    return compare(
+      a.StudyDate,
+      b.StudyDate,
+      compare(a.StudyInstanceUID, b.StudyInstanceUID)
+    );
+  });
+  return ret;
+};
+
+/** The studies retrieve from the Uids is faster and gets the studies
+ * in the original order, as specified.
+ */
+const getStudiesFromUIDs = (
+  metadataStore,
+  studyUids: string[]
+): StudyMetadata[] => {
+  if (!studyUids?.length) return;
+  return studyUids.map(uid => DicomMetadataStore.getStudy(uid));
+};
 
 /**
  * Initialize the route.
@@ -64,21 +110,11 @@ function defaultRouteInit(
       return;
     }
 
-    const studyMap = {};
+    // Use the order as provided by the URL parameters to define the first study
+    const studies =
+      getStudiesFromUIDs(DicomMetadataStore, studyInstanceUIDs) ||
+      getStudiesfromDisplaySets(DicomMetadataStore, displaySets);
 
-    // Prior studies don't quite work properly yet, but the studies list
-    // is at least being generated and passed in.
-    const studies = displaySets.reduce((prev, curr) => {
-      const { StudyInstanceUID } = curr;
-      if (!studyMap[StudyInstanceUID]) {
-        const study = DicomMetadataStore.getStudy(StudyInstanceUID);
-        studyMap[StudyInstanceUID] = study;
-        prev.push(study);
-      }
-      return prev;
-    }, []);
-
-    // The assumption is that the display set at position 0 is the first
     // study being displayed, and is thus the "active" study.
     const activeStudy = studies[0];
 
@@ -133,10 +169,8 @@ export default function ModeRoute({
 
   extensionManager.setActiveDataSource(dataSourceName);
 
-  const dataSources = extensionManager.getActiveDataSource();
+  const dataSource = extensionManager.getActiveDataSource()[0];
 
-  // Only handling one instance of the datasource type (E.g. one DICOMWeb server)
-  const dataSource = dataSources[0];
   // Only handling one route per mode for now
   const route = mode.routes[0];
 

@@ -27,6 +27,27 @@ registered automatically to the HangingProtocolService.
 
 All protocols are stored in the `HangingProtocolService` using their `id` as the key, and the protocol itself as the value.
 
+## Protocol Definition
+Protocols are defined in a getHangingProtocolModule inside an extension.  As such,
+they are defined with a module structure that starts with an id, and has field protocol
+that is the actual protocol definition.  This setup allows defining more than
+one protocol within a module, each one needing it's own definition file.
+
+```javascript
+import MyProtocol from './MyProtocol';
+export default function getHangingProtocolModule() {
+  return [
+    {
+      id: MyProtocol.id,
+      protocol: MyProtocol,
+    },
+  ];
+}
+```
+
+Within the protocol itself, the structure is layed out as described in the HangingProtocol.ts
+type definition, starting with `Protocol`.  See the type definition for more details.
+
 ## Events
 
 There are two events that get publish in `HangingProtocolService`:
@@ -34,11 +55,50 @@ There are two events that get publish in `HangingProtocolService`:
 | Event        | Description                                                          |
 | ------------ | -------------------------------------------------------------------- |
 | NEW_LAYOUT   | Fires when a new layout is requested by the `HangingProtocolService` |
-| STAGE_CHANGE | Fires when the the stage is changed in the hanging protocols         |
-| PROTOCOL_CHANGED | Fires when the the protocol is changed in the hanging protocols         |
-| HANGING_PROTOCOL_APPLIED_FOR_VIEWPORT | Fires when the hanging protocol applies for a viewport (sets its displaySets) |
+| PROTOCOL_CHANGED | Fires when the the protocol is changed in the hanging protocols, or when the applied stage is changed. |
+| RESTORE_PROTOCOL | Fires when the protocol or stage is restored, for example, after turning off MPR mode |
+| STAGE_ACTIVATION | Fires when the stages are known to have stage.status set. |
 
+## Stage Activation and Status
+Sometimes a hanging protocol can be applicable generally, but not all stages
+should be shown by default, or should be shown at all.  This can be handled by
+using the stage activation to control whether the stage is shown by default (`enabled`),
+whether it can be navigated to (`passive`) or whether it should not be shown
+at all (`disabled`).
 
+The `stage.status` is used to control this, and the status is controlled by
+the stage activate.  The status values are:
+
+* enabled - meaning that the stage is fully applicable
+* passive - meaning that the stage can be applied, but might be missing details
+* disabled - meaning that the study has insuffient information for this stage
+
+The setting for these are controlled by the stageActivation property, for example
+
+```javascript
+stageActivation: {
+  // The enabled activation specifies requirements to enable the stage, that is,
+  // make it preferred.
+  enabled: {
+    // The default value here is 1, and indicates how many non-blank viewports
+    // are required.
+    minViewportsMatched: 3,
+    // This enables specifying cross cutting concerns, such as having a stage
+    // only apply to males or females, and is a list of display set selector ids
+    displaySetSelectorsMatched: ['dsMale'],
+  },
+  // The passive check is performed first.  If it fails, the enabled is NOT
+  // checked, but the status set to disabled.  The default passive check
+  // should always be passed, so it is fine to just define enabled if desired.
+  passive: {
+    // The default is 0, which means allow the stage even if no viewports are
+    // filled.  This allows dragging and dropping into the viewports to
+    // make matches manually, which can then be re-used for other stages.
+    minViewportsMatched: 0,
+    displaySetSelectorsMatched: [...],
+  },
+}
+```
 
 ## API
 
@@ -78,7 +138,7 @@ do not overlap, with the suggested id being `${moduleId}.${simpleName}`.  The
 'default' name is used as the hanging protocol id when no other protocol applies,
 and can be set as the last module listed containing 'default'.
 
-A hanging protocol can also be defined with a generator. 
+A hanging protocol can also be defined with a generator.
 A generator is a function we can write this way:
 
 ```ts
