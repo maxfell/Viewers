@@ -63,7 +63,7 @@ export default class CustomizationService extends PubSubService {
 
   modeCustomizations: Record<string, Customization> = {};
   globalCustomizations: Record<string, Customization> = {};
-  configuration: UICustomizationConfiguration;
+  configuration: CustomizationConfiguration;
 
   constructor({ configuration, commandsManager }) {
     super(EVENTS);
@@ -161,15 +161,28 @@ export default class CustomizationService extends PubSubService {
     return this.applyType(customization);
   }
 
+  /**
+   * get is an alias for getModeCustomization, as it is the generic getter
+   * which will return both mode and global customizations, and should be
+   * used generally.
+   * Note that the second parameter, defaultValue, will be expanded to include
+   * any customizationType values defined in it, so it is not the same as doing:
+   *   `customizationService.get('key') || defaultValue`
+   * unless the defaultValue does not contain any customizationType definitions.
+   */
+  public get = this.getModeCustomization;
+
   /** Applies any inheritance due to UI Type customization */
   public applyType(customization: Customization): Customization {
     if (!customization) return customization;
     const { customizationType } = customization;
     if (!customizationType) return customization;
     const parent = this.getModeCustomization(customizationType);
-    return parent
+    const result = parent
       ? Object.assign(Object.create(parent), customization)
       : customization;
+    // Execute an nested type information
+    return result.applyType?.(this) || result;
   }
 
   public addModeCustomizations(modeCustomizations): void {

@@ -1,3 +1,4 @@
+import { CustomizationService } from '@ohif/core';
 import React from 'react';
 import DataSourceSelector from './Panels/DataSourceSelector';
 
@@ -38,6 +39,27 @@ export default function getCustomizationModule() {
             children: DataSourceSelector,
           },
         ],
+      },
+    },
+
+    // Customize any configured context menus
+    {
+      name: 'default',
+      value: {
+        id: 'ohif.contextMenu',
+        applyType: function (customizationService: CustomizationService) {
+          // Don't modify the children, as those are copied by reference
+          this.menus = [...this.menus];
+          const { menus } = this;
+
+          for (const menu of menus) {
+            const { items } = menu;
+            menu.items = [];
+            for (const item of items) {
+              menu.items.push(customizationService.applyType(item));
+            }
+          }
+        },
       },
     },
   ];
