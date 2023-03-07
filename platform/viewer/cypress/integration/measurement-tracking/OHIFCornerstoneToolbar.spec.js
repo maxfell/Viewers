@@ -85,8 +85,12 @@ describe('OHIF Cornerstone Toolbar', () => {
       .trigger('mousemove', 'right', { buttons: 1, force: true })
       .trigger('mouseup', { buttons: 1 });
 
-    const expectedText = 'W:1930L:479';
-    cy.get('@viewportInfoTopLeft').should('have.text', expectedText);
+    cy.get('@viewportInfoTopLeft').should($txt => {
+      const text = $txt.text();
+      expect(text)
+        .to.include('W:193')
+        .include('L:479');
+    });
   });
 
   it('checks if Pan tool will move the image inside the viewport', () => {

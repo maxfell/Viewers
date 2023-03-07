@@ -1,8 +1,10 @@
-import { id } from './id';
+import { id, SEG_TOOLGROUP_DEFAULT } from './id';
 import React from 'react';
+import { Types } from '@ohif/core';
 
 import getSopClassHandlerModule from './getSopClassHandlerModule';
 import PanelSegmentation from './panels/PanelSegmentation';
+import createSEGToolGroupAndAddTools from './utils/initSEGToolGroup';
 
 const Component = React.lazy(() => {
   return import(
@@ -28,17 +30,6 @@ const extension = {
    */
   id,
 
-  /**
-   * Perform any pre-registration tasks here. This is called before the extension
-   * is registered. Usually we run tasks such as: configuring the libraries
-   * (e.g. cornerstone, cornerstoneTools, ...) or registering any services that
-   * this extension is providing.
-   */
-  preRegistration: ({
-    servicesManager,
-    commandsManager,
-    configuration = {},
-  }) => {},
   /**
    * PanelModule should provide a list of panels that will be available in OHIF
    * for Modes to consume and render. Each panel is defined by a {name,
@@ -91,3 +82,8 @@ const extension = {
 };
 
 export default extension;
+
+// Include static exports here
+export {
+  SEG_TOOLGROUP_DEFAULT
+};

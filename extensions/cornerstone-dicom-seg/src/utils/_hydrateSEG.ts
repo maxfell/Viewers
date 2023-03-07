@@ -32,6 +32,19 @@ async function _hydrateSEGDisplaySet({
     displaySetInstanceUID
   );
 
+  const viewportOptions = {
+    viewportType: 'volume',
+    toolGroupId,
+    presentationId: null,
+    initialImageOptions: {
+      preset: 'middle',
+    },
+  };
+
+  // Force volume mode on the selected viewport as well as the other viewports
+  // Otherwise, loading a SEG on a non-volume viewport will fail.
+  updatedViewports.forEach(viewport => viewport.viewportOptions = viewportOptions);
+
   viewportGridService.setDisplaySetsForViewports(updatedViewports);
 
   // Todo: fix this after we have a better way for stack viewport segmentations
@@ -50,17 +63,12 @@ async function _hydrateSEGDisplaySet({
       segDisplaySet.displaySetInstanceUID
     );
 
+
     if (shouldDisplaySeg) {
       viewportGridService.setDisplaySetsForViewport({
         viewportIndex: index,
         displaySetInstanceUIDs: viewport.displaySetInstanceUIDs,
-        viewportOptions: {
-          viewportType: 'volume',
-          toolGroupId,
-          initialImageOptions: {
-            preset: 'middle',
-          },
-        },
+        viewportOptions,
       });
     }
   });
