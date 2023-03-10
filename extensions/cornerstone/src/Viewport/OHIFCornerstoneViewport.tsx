@@ -222,7 +222,7 @@ const OHIFCornerstoneViewport = React.memo(props => {
     );
     const { presentationSync } = stateSyncService.getState();
     if (currentPresentation) {
-      stateSyncService.reduce({
+      stateSyncService.store({
         presentationSync: {
           ...presentationSync,
           [currentPresentation.id]: currentPresentation,
