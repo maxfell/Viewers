@@ -47,6 +47,11 @@ export default function init({ servicesManager, configuration }) {
   // to the previously applied hanging protolStageIndexMap key, in order to toggle
   // off the applied protocol and remember the old state.
   stateSyncService.register('toggleHangingProtocol', { clearOnModeExit: true });
+
+  // Stores the viewports by `rows-cols` position so that when the layout
+  // changes numRows and numCols, the viewports can be remembers and then replaced
+  // afterwards.
+  stateSyncService.register('viewportsByPosition', { clearOnModeExit: true });
 }
 
 const handlePETImageMetadata = ({ SeriesInstanceUID, StudyInstanceUID }) => {
