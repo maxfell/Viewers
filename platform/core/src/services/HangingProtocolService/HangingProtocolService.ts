@@ -919,7 +919,6 @@ export default class HangingProtocolService extends PubSubService {
   public getMissingViewport(
     protocolId: string,
     stageIdx: number,
-    positionId: string,
     options
   ): HangingProtocol.ViewportMatchDetails {
     if (this.protocol.id !== protocolId) {
@@ -933,16 +932,6 @@ export default class HangingProtocolService extends PubSubService {
     if (!defaultViewport) return;
 
     const useViewport = { ...defaultViewport };
-    if (useViewport.displaySetsByPosition) {
-      useViewport.displaySets =
-        useViewport.displaySetsByPosition[positionId] ||
-        defaultViewport.displaySets;
-      if (!useViewport.displaySets) {
-        console.warn('No display sets defined by position');
-        return;
-      }
-    }
-
     return this._matchViewport(useViewport, options);
   }
 

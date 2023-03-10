@@ -33,7 +33,6 @@ export const findOrCreateViewport = (
   const missing = hangingProtocolService.getMissingViewport(
     protocolId,
     stageIndex,
-    positionId,
     options
   );
   if (missing) {

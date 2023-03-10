@@ -61,7 +61,7 @@ async function appInit(appConfigOrFunc, defaultExtensions, defaultModes) {
     CineService.REGISTRATION,
     UserAuthenticationService.REGISTRATION,
     PanelService.REGISTRATION,
-    [StateSyncService.REGISTRATION, appConfig.stateSyncService],
+    StateSyncService.REGISTRATION,
   ]);
 
   errorHandler.getHTTPErrorHandler = () => {

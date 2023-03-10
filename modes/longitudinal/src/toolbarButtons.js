@@ -318,6 +318,7 @@ const toolbarButtons = [
       label: 'Crosshairs',
       commands: [
         {
+          commandName: 'setToolActive',
           commandOptions: {
             toolName: 'Crosshairs',
             toolGroupId: 'mpr',

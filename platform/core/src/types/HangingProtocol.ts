@@ -154,6 +154,8 @@ export type ViewportOptions = {
   allowUnmatchedView?: boolean;
 };
 
+// The options here includes both the display set selector and matching index
+// as well as actual options to apply to the individual viewports.
 export type DisplaySetOptions = {
   // The id is used to choose which display set selector to apply here
   id: string;
@@ -168,7 +170,6 @@ export type DisplaySetOptions = {
 export type Viewport = {
   viewportOptions: ViewportOptions;
   displaySets: DisplaySetOptions[];
-  displaySetsByPosition?: Record<string, DisplaySetOptions[]>;
 };
 
 /**
