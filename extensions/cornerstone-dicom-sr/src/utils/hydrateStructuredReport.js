@@ -2,6 +2,7 @@ import { utilities, metaData } from '@cornerstonejs/core';
 import OHIF, { DicomMetadataStore } from '@ohif/core';
 import getLabelFromDCMJSImportedToolData from './getLabelFromDCMJSImportedToolData';
 import { adaptersSR } from '@cornerstonejs/adapters';
+import convertCode from './convertCode';
 
 const { guid } = OHIF.utils;
 const { MeasurementReport, CORNERSTONE_3D_TAG } = adaptersSR.Cornerstone3D;
@@ -12,16 +13,39 @@ const CORNERSTONE_3D_TOOLS_SOURCE_VERSION = '0.1';
 const supportedLegacyCornerstoneTags = ['cornerstoneTools@^4.0.0'];
 
 /**
+ * Takes a list of codes and runs them through convert, only adding the ones
+ * which are not CORNERSTONEJS issued to the result.
+ */
+const convertSites = (codingValues, sites) => {
+  if (!sites || !sites.length) return;
+  const ret = [];
+  // Do as a loop to convert away from Proxy instances
+  for (let i = 0; i < sites.length; i++) {
+    // Deal with irregular conversion from dcmjs
+    const site = convertCode(codingValues, sites[i][0] || sites[i]);
+    if (site) ret.push(site);
+  }
+  return (ret.length && ret) || undefined;
+};
+
+/**
  * Hydrates a structured report, for default viewports.
- *
  */
 export default function hydrateStructuredReport(
   { servicesManager, extensionManager },
   displaySetInstanceUID
 ) {
   const dataSource = extensionManager.getActiveDataSource()[0];
-  const { measurementService, displaySetService } = servicesManager.services;
+  const {
+    measurementService,
+    displaySetService,
+    customizationService,
+  } = servicesManager.services;
 
+  const codingValues = customizationService.getCustomization(
+    'codingValues',
+    {}
+  );
   const displaySet = displaySetService.getDisplaySetByUID(
     displaySetInstanceUID
   );
@@ -171,6 +195,15 @@ export default function hydrateStructuredReport(
         CORNERSTONE_3D_TOOLS_SOURCE_VERSION
       );
       annotation.data.label = getLabelFromDCMJSImportedToolData(toolData);
+      annotation.data.finding = convertCode(
+        codingValues,
+        toolData.finding?.[0]
+      );
+      annotation.data.findingSites = convertSites(
+        codingValues,
+        toolData.findingSites
+      );
+      annotation.data.site = annotation.data.findingSites?.[0];
 
       const matchingMapping = mappings.find(
         m => m.annotationType === annotationType

@@ -63,7 +63,7 @@ export default class CustomizationService extends PubSubService {
 
   modeCustomizations: Record<string, Customization> = {};
   globalCustomizations: Record<string, Customization> = {};
-  configuration: UICustomizationConfiguration;
+  configuration: CustomizationConfiguration;
 
   constructor({ configuration, commandsManager }) {
     super(EVENTS);
@@ -97,36 +97,6 @@ export default class CustomizationService extends PubSubService {
     this.modeCustomizations = {};
   }
 
-  /**
-   *
-   * @param {*} interaction - can be undefined to run nothing
-   * @param {*} extraOptions to include in the commands run
-   */
-  recordInteraction(
-    interaction: Customization | void,
-    extraOptions?: Record<string, unknown>
-  ): void {
-    if (!interaction) return;
-    const commandsManager = this.commandsManager;
-    const { commands = [] } = interaction;
-
-    commands.forEach(({ commandName, commandOptions, context }) => {
-      if (commandName) {
-        commandsManager.runCommand(
-          commandName,
-          {
-            interaction,
-            ...commandOptions,
-            ...extraOptions,
-          },
-          context
-        );
-      } else {
-        console.warn('No command name supplied in', interaction);
-      }
-    });
-  }
-
   public getModeCustomizations(): Record<string, Customization> {
     return this.modeCustomizations;
   }
@@ -143,6 +113,16 @@ export default class CustomizationService extends PubSubService {
       buttons: this.modeCustomizations,
       button: this.modeCustomizations[customizationId],
     });
+  }
+
+  /** This is the preferred getter, getting mode customizations first and
+   * otherwise global customizations.
+   */
+  public getCustomization(
+    customizationId: string,
+    defaultValue?: Customization
+  ): Customization | void {
+    return this.getModeCustomization(customizationId, defaultValue);
   }
 
   /** Mode customizations are changes to the behaviour of the extensions

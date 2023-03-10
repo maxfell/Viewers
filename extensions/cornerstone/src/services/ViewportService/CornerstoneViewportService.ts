@@ -1,4 +1,4 @@
-import { pubSubServiceInterface } from '@ohif/core';
+import { PubSubService } from '@ohif/core';
 import {
   RenderingEngine,
   StackViewport,
@@ -37,18 +37,13 @@ const EVENTS = {
  * Handles cornerstone viewport logic including enabling, disabling, and
  * updating the viewport.
  */
-class CornerstoneViewportService implements IViewportService {
+class CornerstoneViewportService extends PubSubService
+  implements IViewportService {
   renderingEngine: Types.IRenderingEngine | null;
   viewportsInfo: Map<number, ViewportInfo>;
   viewportGridResizeObserver: ResizeObserver | null;
   viewportsDisplaySets: Map<string, string[]> = new Map();
 
-  /**
-   * Service-specific
-   */
-  EVENTS: { [key: string]: string };
-  listeners: { [key: string]: Array<(...args: any[]) => void> };
-  _broadcastEvent: unknown; // we should be able to extend the PubSub class to get this
   // Some configs
   enableResizeDetector: true;
   resizeRefreshRateMs: 200;
@@ -56,15 +51,12 @@ class CornerstoneViewportService implements IViewportService {
   servicesManager = null;
 
   constructor(servicesManager) {
+    super(EVENTS);
     this.renderingEngine = null;
     this.viewportGridResizeObserver = null;
     this.viewportsInfo = new Map();
     //
-    this.listeners = {};
-    this.EVENTS = EVENTS;
     this.servicesManager = servicesManager;
-    Object.assign(this, pubSubServiceInterface);
-    //
   }
 
   /**

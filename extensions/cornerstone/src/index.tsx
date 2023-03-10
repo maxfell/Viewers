@@ -7,6 +7,7 @@ import {
   imageRetrievalPoolManager,
 } from '@cornerstonejs/core';
 import { Enums as cs3DToolsEnums } from '@cornerstonejs/tools';
+import { ServicesManager } from '@ohif/core';
 import { Types } from '@ohif/core';
 
 import init from './init';
@@ -94,12 +95,12 @@ const cornerstoneExtension: Types.Extensions.Extension = {
       // const onNewImageHandler = jumpData => {
       //   commandsManager.runCommand('jumpToImage', jumpData);
       // };
-      const { ToolbarService } = servicesManager.services;
+      const { toolbarService } = (servicesManager as ServicesManager).services;
 
       return (
         <OHIFCornerstoneViewport
           {...props}
-          ToolbarService={ToolbarService}
+          toolbarService={toolbarService}
           servicesManager={servicesManager}
           commandsManager={commandsManager}
         />

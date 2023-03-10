@@ -213,7 +213,10 @@ class ViewportInfo {
   }
 
   public getSyncGroups(): SyncGroup[] {
-    return this.viewportOptions.syncGroups || [];
+    if (!this.viewportOptions.syncGroups) {
+      this.viewportOptions.syncGroups = [];
+    }
+    return this.viewportOptions.syncGroups;
   }
 
   public getDisplaySetOptions(): Array<DisplaySetOptions> {
@@ -241,7 +244,7 @@ class ViewportInfo {
   }
 
   private mapDisplaySetOptions(
-    publicDisplaySetOptions: Array<PublicDisplaySetOptions>
+    publicDisplaySetOptions: Array<PublicDisplaySetOptions> = [{}]
   ): Array<DisplaySetOptions> {
     const displaySetOptions: Array<DisplaySetOptions> = [];
 

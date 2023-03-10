@@ -128,6 +128,96 @@ const commandsModule = ({ servicesManager }) => {
       });
       viewport.render();
     },
+    toggleCrosshairs({ toolGroupId, toggledState }) {
+      const toolName = 'Crosshairs';
+      // If it is Enabled
+      if (toggledState) {
+        actions.setToolActive({ toolName, toolGroupId });
+        return;
+      }
+      const toolGroup = _getToolGroup(toolGroupId);
+
+      if (!toolGroup) {
+        return;
+      }
+
+      toolGroup.setToolDisabled(toolName);
+
+      // Get the primary toolId from the ToolBarService and set it to active
+      // Since it was set to passive if not already active
+      const primaryActiveTool = ToolBarService.state.primaryToolId;
+      if (
+        toolGroup?.toolOptions[primaryActiveTool]?.mode ===
+        Enums.ToolModes.Passive
+      ) {
+        toolGroup.setToolActive(primaryActiveTool, {
+          bindings: [{ mouseButton: Enums.MouseBindings.Primary }],
+        });
+      }
+    },
+    toggleComparison: ({ toggledState }) => {
+      ComparisonModeService.toggleComparisonHangingProtocol({
+        toggledState,
+        getToolGroup: _getToolGroup,
+      });
+    },
+    setComparisonModeType: ({ modeType }) => {
+      ComparisonModeService.changeComparisonModeLayout(modeType);
+    },
+    togglePointCross({ toolGroupId, toggledState }) {
+      const toolName = 'PointCross';
+      // If it is Enabled
+      if (toggledState) {
+        actions.setToolActive({ toolName, toolGroupId });
+        return;
+      }
+      const toolGroup = _getToolGroup(toolGroupId);
+
+      if (!toolGroup) {
+        return;
+      }
+
+      toolGroup.setToolDisabled(toolName);
+
+      // Get the primary toolId from the ToolBarService and set it to active
+      // Since it was set to passive if not already active
+      const primaryActiveTool = ToolBarService.state.primaryToolId;
+      if (
+        toolGroup?.toolOptions[primaryActiveTool]?.mode ===
+        Enums.ToolModes.Passive
+      ) {
+        toolGroup.setToolActive(primaryActiveTool, {
+          bindings: [{ mouseButton: Enums.MouseBindings.Primary }],
+        });
+      }
+    },
+    toggleSegmentationLabel({ toolGroupId, toggledState }) {
+      const toolName = 'SegRepresentationalLabelTool';
+      // If it is Enabled
+      if (toggledState) {
+        actions.setToolActive({ toolName, toolGroupId });
+        return;
+      }
+      const toolGroup = _getToolGroup(toolGroupId);
+
+      if (!toolGroup) {
+        return;
+      }
+
+      toolGroup.setToolDisabled(toolName);
+
+      // Get the primary toolId from the ToolBarService and set it to active
+      // Since it was set to passive if not already active
+      const primaryActiveTool = ToolBarService.state.primaryToolId;
+      if (
+        toolGroup?.toolOptions[primaryActiveTool]?.mode ===
+        Enums.ToolModes.Passive
+      ) {
+        toolGroup.setToolActive(primaryActiveTool, {
+          bindings: [{ mouseButton: Enums.MouseBindings.Primary }],
+        });
+      }
+    },
     setToolActive: ({ toolName, toolGroupId = null }) => {
       if (toolName === 'Crosshairs') {
         const activeViewportToolGroup = _getToolGroup(null);
@@ -150,7 +240,7 @@ const commandsModule = ({ servicesManager }) => {
       };
 
       const toolGroup = _getToolGroup(toolGroupId);
-      const toolGroupViewportIds = toolGroup.getViewportIds();
+      const toolGroupViewportIds = toolGroup?.getViewportIds?.();
 
       // if toolGroup has been destroyed, or its viewports have been removed
       if (!toolGroupViewportIds || !toolGroupViewportIds.length) {
