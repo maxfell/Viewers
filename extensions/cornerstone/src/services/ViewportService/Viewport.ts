@@ -144,7 +144,7 @@ class ViewportInfo {
   }
 
   public setPublicDisplaySetOptions(
-    publicDisplaySetOptions: Array<PublicDisplaySetOptions>
+    publicDisplaySetOptions: PublicDisplaySetOptions[] | DisplaySetSelector[]
   ): void {
     // map the displaySetOptions and check if they are undefined then set them to default values
     const displaySetOptions = this.mapDisplaySetOptions(
@@ -248,13 +248,15 @@ class ViewportInfo {
     return this.viewportOptions.initialImageOptions;
   }
 
+  // Handle incoming public display set options or a display set select
+  // with a contained options.
   private mapDisplaySetOptions(
-    displaySetSelectors: Array<DisplaySetSelector> = [{}]
+    options: PublicDisplaySetOptions[] | DisplaySetSelector[] = [{}]
   ): Array<DisplaySetOptions> {
     const displaySetOptions: Array<DisplaySetOptions> = [];
 
-    displaySetSelectors.forEach(selector => {
-      let option = selector?.options;
+    options.forEach(item => {
+      let option = item?.options || item;
       if (!option) {
         option = {
           blendMode: undefined,
