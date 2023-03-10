@@ -1,7 +1,7 @@
 import { HangingProtocolService, StateSyncService, Types } from '@ohif/core';
 
 export type ReturnType = {
-  hanging: Record<string, Types.HangingProtocol.HPInfo>;
+  hangingProtocolStageIndexMap: Record<string, Types.HangingProtocol.HPInfo>;
   viewportGridStore: Record<string, unknown>;
   displaySetSelectorMap: Record<string, string>;
 };
@@ -28,7 +28,9 @@ const reuseCachedLayout = (
   const syncState = syncService.getState();
   const cacheId = `${activeStudyUID}:${protocolId}`;
   const viewportGridStore = { ...syncState.viewportGridStore };
-  const hanging = { ...syncState.hanging };
+  const hangingProtocolStageIndexMap = {
+    ...syncState.hangingProtocolStageIndexMap,
+  };
   const displaySetSelectorMap = { ...syncState.displaySetSelectorMap };
   const { rows, cols } = stage.viewportStructure.properties;
   const custom =
@@ -36,7 +38,7 @@ const reuseCachedLayout = (
     state.layout.numRows !== rows ||
     state.layout.numCols !== cols;
 
-  hanging[cacheId] = hpInfo;
+  hangingProtocolStageIndexMap[cacheId] = hpInfo;
 
   if (storeId && custom) {
     viewportGridStore[storeId] = { ...state };
@@ -63,7 +65,11 @@ const reuseCachedLayout = (
     }
   }
 
-  return { hanging, viewportGridStore, displaySetSelectorMap };
+  return {
+    hangingProtocolStageIndexMap,
+    viewportGridStore,
+    displaySetSelectorMap,
+  };
 };
 
 export default reuseCachedLayout;

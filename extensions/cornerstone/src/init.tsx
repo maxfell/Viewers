@@ -74,6 +74,7 @@ export default async function init({
     hangingProtocolService,
     toolGroupService,
     viewportGridService,
+    stateSyncService,
   } = servicesManager.services;
 
   window.services = servicesManager.services;
@@ -96,6 +97,10 @@ export default async function init({
   ) {
     _showCPURenderingModal(uiModalService, hangingProtocolService);
   }
+
+  // Stores a map from `presentationId` to a Presentation object so that
+  // an OHIFCornerstoneViewport can be redisplayed with the same attributes
+  stateSyncService.register('presentationSync', { clearOnModeExit: true });
 
   const labelmapRepresentation =
     cornerstoneTools.Enums.SegmentationRepresentations.Labelmap;

@@ -117,7 +117,7 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
           stateSyncService
         );
         const {
-          hanging,
+          hangingProtocolStageIndexMap,
           viewportGridStore,
           displaySetSelectorMap,
         } = stateSyncReduce;
@@ -132,7 +132,7 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
           // Re-set the same stage as was previously used
           const hangingId = `${activeStudyUID ||
             hpInfo.activeStudyUID}:${protocolId}`;
-          stageIndex = hanging[hangingId]?.stageIndex;
+          stageIndex = hangingProtocolStageIndexMap[hangingId]?.stageIndex;
         }
 
         const useStageIdx =
