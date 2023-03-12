@@ -47,7 +47,7 @@ COPY preinstall.js /usr/src/app/preinstall.js
 RUN yarn config set workspaces-experimental true
 RUN yarn install
 
-ENV APP_CONFIG=config/docker_openresty-orthanc.js
+ENV APP_CONFIG=config/wizoz.js
 ENV PATH /usr/src/app/node_modules/.bin:$PATH
 
 ENV QUICK_BUILD true

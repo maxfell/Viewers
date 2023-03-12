@@ -1,5 +1,5 @@
 {
-  "Name": "Orthanc inside Docker",
+  "Name": "WizOz Orthanc",
   "StorageDirectory": "/var/lib/orthanc/db",
   "IndexDirectory": "/var/lib/orthanc/db",
   "StorageCompression": false,
@@ -30,9 +30,9 @@
   "RemoteAccessAllowed": true,
   "SslEnabled": false,
   "SslCertificate": "certificate.pem",
-  "AuthenticationEnabled": false,
+  "AuthenticationEnabled": true,
   "RegisteredUsers": {
-    "test": "test"
+    "wizoz": "wizoz123"
   },
   "DicomModalities": {},
   "DicomModalitiesInDatabase": false,
